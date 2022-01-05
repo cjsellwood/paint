@@ -5,13 +5,14 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { createStore, combineReducers } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import paint, { Rectangle } from "./store/reducers/paint";
+import paint, { Step } from "./store/reducers/paint";
 
 const composeEnhancers = composeWithDevTools({});
 
 export interface RootState {
   paint: {
-    rectangle: Rectangle;
+    steps: Step[];
+    color: string;
   };
 }
 

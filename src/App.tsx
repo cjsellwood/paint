@@ -1,6 +1,7 @@
 import React from "react";
 import classes from "./App.module.css";
 import Canvas from "./components/Canvas";
+import Controls from "./components/Controls";
 
 function App() {
   return (
@@ -9,7 +10,9 @@ function App() {
       <div className={classes.canvasContainer}>
         <Canvas />
       </div>
-      <div className={classes.controls}></div>
+      <div className={classes.controls}>
+        <Controls />
+      </div>
     </div>
   );
 }

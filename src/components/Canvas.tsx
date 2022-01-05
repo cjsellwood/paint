@@ -1,98 +1,139 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import classes from "./Canvas.module.css";
-import { saveRectangle } from "../store/actions/paint";
+import { saveStep, blankStep } from "../store/actions/paint";
 import { RootState } from "../index";
 
 const Canvas = () => {
   const ref = useRef(null);
+  const topLayerRef = useRef(null);
   const dispatch = useDispatch();
+  const steps = useSelector((state: RootState) => state.paint.steps);
+  const stateColor = useSelector((state: RootState) => state.paint.color);
+
+  // Use ref for colors to pass updated colours to event listeners
+  const colorRef = useRef(stateColor);
+  useEffect(() => {
+    colorRef.current = stateColor;
+  }, [stateColor]);
+
+  const stepsRef = useRef(steps);
+  useEffect(() => {
+    stepsRef.current = steps;
+  }, [steps]);
+
+  useEffect(() => {
+    // Load canvas and resize canvas to fit screen
+    let canvas = ref.current! as HTMLCanvasElement;
+
+    // Resize canvas to fit screen
+    canvas.width = window.innerWidth - 20;
+    canvas.height = window.innerHeight - 170;
+
+    let topCanvas = topLayerRef.current! as HTMLCanvasElement;
+    topCanvas.width = window.innerWidth - 20;
+    topCanvas.height = window.innerHeight - 170;
+  }, []);
 
   useEffect(() => {
     // Load canvas and rendering context
     let canvas = ref.current! as HTMLCanvasElement;
     const context = canvas.getContext("2d")!;
 
-    // Resize canvas to fit screen
-    canvas.width = window.innerWidth - 20;
-    canvas.height = window.innerHeight - 170;
+    let minLeft: number;
+    let minTop: number;
+    let newWidth: number;
+    let newHeight: number;
 
-    // Draw rectangles
-    context.fillStyle = "rgb(200, 0, 0)";
-    context.fillRect(10, 10, 50, 50);
-    context.fillStyle = "rgba(0, 0, 200, 0.5)";
-    context.fillRect(30, 30, 50, 50);
-    context.strokeStyle = "rgb(0, 160, 0)";
-    context.strokeRect(100, 100, 50, 50);
+    let topCanvas = topLayerRef.current! as HTMLCanvasElement;
+    const topContext = topCanvas.getContext("2d")!;
 
-    canvas.addEventListener("mousedown", (e) => {
-      console.log(e);
+    const handleMouseHold = (e: MouseEvent) => {
       // Get position of canvas on page
-      const { left, top } = canvas.getBoundingClientRect();
+      const { left, top } = topCanvas.getBoundingClientRect();
 
       // Get mouse coordinates relative to canvas
       const startX = e.x - left;
       const startY = e.y - top;
 
-      let rectangle = { left: 0, top: 0, width: 0, height: 0 };
-
       const handleMouseMove = (e2: MouseEvent) => {
-        // Clear previous rectangle
-        // console.log(stateRectangle);
-        // context.clearRect(
-        //   stateRectangle.left,
-        //   stateRectangle.top,
-        //   stateRectangle.width,
-        //   stateRectangle.height
-        // );
-
         // Get mouse current position
         const currentX = e2.clientX - left;
         const currentY = e2.clientY - top;
 
         // Get lowest left coordinate and top coordinate
-        const minLeft = Math.min(currentX, startX);
-        const minTop = Math.min(currentY, startY);
+        minLeft = Math.min(currentX, startX);
+        minTop = Math.min(currentY, startY);
 
         // Calculate width and height of rectangle
-        const newWidth = Math.abs(startX - currentX);
-        const newHeight = Math.abs(startY - currentY);
+        newWidth = Math.abs(startX - currentX);
+        newHeight = Math.abs(startY - currentY);
 
-        // Save rectangle to state and draw new rectangle
-        // dispatch(
-        //   saveRectangle({
-        //     left: minLeft,
-        //     top: minTop,
-        //     width: newWidth,
-        //     height: newHeight,
-        //   })
-        // );
+        // Set color from state
+        topContext.fillStyle = colorRef.current;
 
-        context.clearRect(
-          rectangle.left,
-          rectangle.top,
-          rectangle.width,
-          rectangle.height
-        );
+        topContext.clearRect(0, 0, topCanvas.width, topCanvas.height);
 
-        rectangle = {
-          left: minLeft,
-          top: minTop,
-          width: newWidth,
-          height: newHeight,
-        };
-        context.fillRect(minLeft, minTop, newWidth, newHeight);
+        topContext.fillRect(minLeft, minTop, newWidth, newHeight);
       };
 
-      canvas.addEventListener("mousemove", handleMouseMove);
+      const handleMouseUp = () => {
+        // Save final rectangle to state if one was drawn
+        if (minLeft && minTop && newWidth && newHeight) {
+          dispatch(
+            saveStep({
+              method: "fillRect",
+              color: colorRef.current,
+              value: {
+                left: minLeft,
+                top: minTop,
+                width: newWidth,
+                height: newHeight,
+              },
+            })
+          );
+        } else {
+          // Else add no step but modify so that useEffect runs again
+          dispatch(blankStep());
+        }
+        topCanvas.removeEventListener("mousemove", handleMouseMove);
 
-      canvas.addEventListener("mouseup", () => {
-        canvas.removeEventListener("mousemove", handleMouseMove);
-      });
-    });
-  }, []);
+        // Clear canvas and redraw from steps saved in state
+        context.clearRect(0, 0, canvas.width, canvas.height);
 
-  return <canvas ref={ref} className={classes.canvas}></canvas>;
+        for (let step of stepsRef.current) {
+          if (step.method === "fillRect") {
+            context.fillStyle = step.color;
+            context.fillRect(
+              step.value.left,
+              step.value.top,
+              step.value.width,
+              step.value.height
+            );
+          }
+        }
+
+        // Add newest drawing to bottom canvas
+        context.fillStyle = colorRef.current;
+
+        context.fillRect(minLeft, minTop, newWidth, newHeight);
+        topCanvas.removeEventListener("mouseup", handleMouseUp);
+      };
+
+      topCanvas.addEventListener("mouseup", handleMouseUp);
+      topCanvas.addEventListener("mousemove", handleMouseMove);
+    };
+
+    // Add event listener for holding mouse down
+    topCanvas.addEventListener("mousedown", handleMouseHold);
+  }, [dispatch]);
+
+  return (
+    <React.Fragment>
+      <canvas ref={ref} className={classes.canvas}></canvas>
+      <canvas ref={topLayerRef} className={classes.topLayer}></canvas>
+    </React.Fragment>
+  );
 };
 
 export default Canvas;

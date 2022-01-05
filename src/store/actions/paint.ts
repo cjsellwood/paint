@@ -1,8 +1,23 @@
-import { Rectangle } from "../reducers/paint";
+import { Step } from "../reducers/paint";
 
-export const saveRectangle = (rectangle: Rectangle) => {
+export const saveStep = ({ method, value, color }: Step) => {
   return {
-    type: "SAVE_RECTANGLE",
-    rectangle,
+    type: "SAVE_STEP",
+    value,
+    method,
+    color,
+  };
+};
+
+export const blankStep = () => {
+  return {
+    type: "BLANK_STEP",
+  };
+};
+
+export const setColor = (color: string) => {
+  return {
+    type: "SET_COLOR",
+    color,
   };
 };
