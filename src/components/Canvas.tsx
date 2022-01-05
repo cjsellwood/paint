@@ -20,6 +20,7 @@ const Canvas = () => {
   const stepsRef = useRef(steps);
   useEffect(() => {
     stepsRef.current = steps;
+    console.log(steps)
   }, [steps]);
 
   useEffect(() => {
@@ -48,7 +49,7 @@ const Canvas = () => {
     let topCanvas = topLayerRef.current! as HTMLCanvasElement;
     const topContext = topCanvas.getContext("2d")!;
 
-    const handleMouseHold = (e: MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => {
       // Get position of canvas on page
       const { left, top } = topCanvas.getBoundingClientRect();
 
@@ -77,7 +78,8 @@ const Canvas = () => {
         topContext.fillRect(minLeft, minTop, newWidth, newHeight);
       };
 
-      const handleMouseUp = () => {
+      const handleMouseUp = (e: MouseEvent) => {
+        console.log("MOUSE UP");
         // Save final rectangle to state if one was drawn
         if (minLeft && minTop && newWidth && newHeight) {
           dispatch(
@@ -118,14 +120,38 @@ const Canvas = () => {
 
         context.fillRect(minLeft, minTop, newWidth, newHeight);
         topCanvas.removeEventListener("mouseup", handleMouseUp);
+        topCanvas.removeEventListener("mouseleave", handleMouseLeave);
       };
+
+      // If mouse leaves canvas cancel drawing and reset canvas
+      const handleMouseLeave = (e: MouseEvent) => {
+        console.log("LEAVE");
+        topContext.clearRect(0, 0, topCanvas.width, topCanvas.height);
+        minLeft = 0;
+        minTop = 0;
+        newWidth = 0;
+        newHeight = 0;
+        topCanvas.removeEventListener("mousemove", handleMouseMove);
+        topCanvas.removeEventListener("mouseup", handleMouseUp);
+        topCanvas.removeEventListener("mouseleave", handleMouseLeave);
+        topCanvas.removeEventListener("mousedown", handleMouseDown);
+      };
+
+      topCanvas.addEventListener("mouseleave", handleMouseLeave);
 
       topCanvas.addEventListener("mouseup", handleMouseUp);
       topCanvas.addEventListener("mousemove", handleMouseMove);
     };
 
+    const handleMouseEnter = () => {
+      console.log("ENTER");
+      topCanvas.addEventListener("mousedown", handleMouseDown)
+    };
+
+    topCanvas.addEventListener("mouseenter", handleMouseEnter);
+
     // Add event listener for holding mouse down
-    topCanvas.addEventListener("mousedown", handleMouseHold);
+    // topCanvas.addEventListener("mousedown", handleMouseDown);
   }, [dispatch]);
 
   return (
