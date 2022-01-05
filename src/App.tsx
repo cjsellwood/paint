@@ -1,16 +1,15 @@
 import React from "react";
 import classes from "./App.module.css";
+import Canvas from "./components/Canvas";
 
 function App() {
   return (
     <div className="App">
       <h1 className={classes.title}>Paint</h1>
       <div className={classes.canvasContainer}>
-        <canvas className={classes.canvas}></canvas>
+        <Canvas />
       </div>
-      <div className={classes.controls}>
-
-      </div>
+      <div className={classes.controls}></div>
     </div>
   );
 }

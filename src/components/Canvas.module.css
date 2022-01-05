@@ -1,0 +1,4 @@
+.canvas {
+  box-shadow: 4px 4px 4px rgb(211, 211, 211), -4px -4px 4px rgb(211, 211, 211),
+    4px -4px 4px rgb(211, 211, 211), -4px 4px 4px rgb(211, 211, 211);
+}

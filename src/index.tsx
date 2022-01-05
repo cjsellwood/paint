@@ -5,9 +5,15 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { createStore, combineReducers } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import paint from "./store/reducers/paint";
+import paint, { Rectangle } from "./store/reducers/paint";
 
 const composeEnhancers = composeWithDevTools({});
+
+export interface RootState {
+  paint: {
+    rectangle: Rectangle;
+  };
+}
 
 const rootReducer = combineReducers({
   paint: paint,
@@ -17,8 +23,9 @@ const store = createStore(rootReducer, composeEnhancers());
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}></Provider>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );
