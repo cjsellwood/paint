@@ -30,6 +30,7 @@ const Controls = () => {
           <option value="circle">Circle</option>
           <option value="circleOutline">Circle Outline</option>
           <option value="line">Line</option>
+          <option value="pencil">Pencil</option>
         </select>
         <label>Thickness</label>
         <input

@@ -11,9 +11,10 @@ import {
   clearCanvas,
   drawBackground,
   drawLine,
+  drawPencil,
 } from "./functions/drawing";
 import drawAllSteps from "./functions/drawAllSteps";
-import { Step } from "../store/reducers/paint";
+import { Step } from "../store/reducers/paintTypes";
 
 const Canvas = () => {
   const ref = useRef(null);
@@ -78,6 +79,8 @@ const Canvas = () => {
     let circleY: number;
     let circleR: number;
 
+    let coordinates: { x: number; y: number }[];
+
     const topCanvas = topLayerRef.current! as HTMLCanvasElement;
     const topContext = topCanvas.getContext("2d")!;
 
@@ -92,8 +95,12 @@ const Canvas = () => {
       let currentX: number;
       let currentY: number;
 
+      coordinates = [{ x: startX, y: startY }];
+
       const handleMouseMove = (e2: MouseEvent) => {
-        clearCanvas(topCanvas);
+        if (toolRef.current !== "pencil") {
+          clearCanvas(topCanvas);
+        }
 
         // Get mouse current position
         currentX = e2.clientX - left;
@@ -125,6 +132,11 @@ const Canvas = () => {
             Math.min(startX, currentX) + Math.abs(startX - currentX) / 2;
           circleY =
             Math.min(startY, currentY) + Math.abs(startY - currentY) / 2;
+        }
+
+        // Add coordinates of mouse if pencil selected
+        if (toolRef.current === "pencil") {
+          coordinates.push({ x: currentX, y: currentY });
         }
 
         switch (toolRef.current) {
@@ -171,6 +183,14 @@ const Canvas = () => {
               startY,
               currentX,
               currentY
+            );
+            break;
+          case "pencil":
+            drawPencil(
+              topContext,
+              colorRef.current,
+              thicknessRef.current,
+              coordinates.slice(coordinates.length - 3, coordinates.length)
             );
             break;
           default:
@@ -255,6 +275,16 @@ const Canvas = () => {
             },
           };
           dispatch(saveStep(newStep));
+        } else if (toolRef.current === "pencil" && coordinates.length > 1) {
+          newStep = {
+            color: colorRef.current,
+            value: {
+              type: "pencil",
+              thickness: thicknessRef.current,
+              coordinates,
+            },
+          };
+          dispatch(saveStep(newStep));
         } else {
           // Add no step but modify so that useEffect runs again
           dispatch(blankStep());
@@ -278,6 +308,7 @@ const Canvas = () => {
         circleR = 0;
         currentX = 0;
         currentY = 0;
+        coordinates = [{ x: 0, y: 0 }];
 
         // Stop listening to mouse movements
         topCanvas.removeEventListener("mousemove", handleMouseMove);
@@ -298,6 +329,7 @@ const Canvas = () => {
         circleR = 0;
         currentX = 0;
         currentY = 0;
+        coordinates = [{ x: 0, y: 0 }];
 
         topCanvas.removeEventListener("mousemove", handleMouseMove);
         topCanvas.removeEventListener("mouseup", handleMouseUp);

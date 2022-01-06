@@ -4,8 +4,9 @@ import {
   drawCircle,
   drawCircleOutline,
   drawLine,
+  drawPencil,
 } from "./drawing";
-import { Step } from "../../store/reducers/paint";
+import { Step } from "../../store/reducers/paintTypes";
 
 const drawAllSteps = (
   context: CanvasRenderingContext2D,
@@ -57,6 +58,13 @@ const drawAllSteps = (
         step.value.startY,
         step.value.endX,
         step.value.endY
+      );
+    } else if (step.value.type === "pencil") {
+      drawPencil(
+        context,
+        step.color,
+        step.value.thickness,
+        step.value.coordinates
       );
     }
   }

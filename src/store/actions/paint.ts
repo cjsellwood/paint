@@ -1,4 +1,4 @@
-import { Step } from "../reducers/paint";
+import { Step } from "../reducers/paintTypes";
 
 export const saveStep = ({ value, color }: Step) => {
   return {

@@ -78,3 +78,19 @@ export const drawLine = (
   context.lineTo(endX, endY);
   context.stroke();
 };
+
+export const drawPencil = (
+  context: CanvasRenderingContext2D,
+  color: string,
+  thickness: number,
+  coordinates: { x: number; y: number }[]
+) => {
+  context.beginPath();
+  context.strokeStyle = color;
+  context.lineWidth = thickness;
+  for (let point of coordinates) {
+    context.lineTo(point.x, point.y);
+    context.stroke();
+  }
+  context.closePath();
+};

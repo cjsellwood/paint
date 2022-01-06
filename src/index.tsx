@@ -5,7 +5,8 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { createStore, combineReducers } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
-import paint, { Step } from "./store/reducers/paint";
+import paint from "./store/reducers/paint";
+import { Step } from "./store/reducers/paintTypes";
 
 const composeEnhancers = composeWithDevTools({});
 
