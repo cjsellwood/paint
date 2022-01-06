@@ -9,6 +9,7 @@ import {
   drawCircle,
   drawCircleOutline,
   clearCanvas,
+  drawBackground,
 } from "./functions/drawing";
 
 const Canvas = () => {
@@ -54,6 +55,9 @@ const Canvas = () => {
     // Load canvas and rendering context
     let canvas = ref.current! as HTMLCanvasElement;
     const context = canvas.getContext("2d")!;
+
+    // Add white background
+    drawBackground(canvas);
 
     let minLeft: number;
     let minTop: number;
@@ -219,6 +223,7 @@ const Canvas = () => {
 
         // Clear canvas and redraw from steps saved in state
         clearCanvas(canvas);
+        drawBackground(canvas);
         for (let step of stepsRef.current) {
           if (step.value.type === "rectangle") {
             drawRectangle(

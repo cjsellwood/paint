@@ -3,6 +3,11 @@ export const clearCanvas = (canvas: HTMLCanvasElement): void => {
   context.clearRect(0, 0, canvas.width, canvas.height);
 };
 
+export const drawBackground = (canvas: HTMLCanvasElement): void => {
+  const context = canvas.getContext("2d")!;
+  drawRectangle(context, "#fff", 0, 0, canvas.width, canvas.height);
+};
+
 export const drawRectangle = (
   context: CanvasRenderingContext2D,
   color: string,
