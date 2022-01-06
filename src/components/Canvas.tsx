@@ -10,6 +10,7 @@ import {
   drawCircleOutline,
   clearCanvas,
   drawBackground,
+  drawLine,
 } from "./functions/drawing";
 
 const Canvas = () => {
@@ -79,12 +80,15 @@ const Canvas = () => {
       const startX = e.x - left;
       const startY = e.y - top;
 
+      let currentX: number;
+      let currentY: number;
+
       const handleMouseMove = (e2: MouseEvent) => {
         clearCanvas(topCanvas);
 
         // Get mouse current position
-        const currentX = e2.clientX - left;
-        const currentY = e2.clientY - top;
+        currentX = e2.clientX - left;
+        currentY = e2.clientY - top;
 
         // Calculate necessary variables for rectangles
         if (
@@ -145,6 +149,16 @@ const Canvas = () => {
               circleX,
               circleY,
               circleR
+            );
+            break;
+          case "line":
+            drawLine(
+              topContext,
+              colorRef.current,
+              startX,
+              startY,
+              currentX,
+              currentY
             );
             break;
           default:
@@ -216,6 +230,19 @@ const Canvas = () => {
               },
             })
           );
+        } else if (toolRef.current === "line") {
+          dispatch(
+            saveStep({
+              color: colorRef.current,
+              value: {
+                type: "line",
+                startX,
+                startY,
+                endX: currentX,
+                endY: currentY,
+              },
+            })
+          );
         } else {
           // Add no step but modify so that useEffect runs again
           dispatch(blankStep());
@@ -259,6 +286,15 @@ const Canvas = () => {
               step.value.y,
               step.value.r
             );
+          } else if (step.value.type === "line") {
+            drawLine(
+              context,
+              step.color,
+              step.value.startX,
+              step.value.startY,
+              step.value.endX,
+              step.value.endY
+            );
           }
         }
 
@@ -291,6 +327,15 @@ const Canvas = () => {
             circleY,
             circleR
           );
+        } else if (toolRef.current === "line") {
+          drawLine(
+            context,
+            colorRef.current,
+            startX,
+            startY,
+            currentX,
+            currentY
+          );
         }
 
         // Reset variables
@@ -301,6 +346,8 @@ const Canvas = () => {
         circleX = 0;
         circleY = 0;
         circleR = 0;
+        currentX = 0;
+        currentY = 0;
 
         // Stop listening to mouse movements
         topCanvas.removeEventListener("mousemove", handleMouseMove);
@@ -319,6 +366,8 @@ const Canvas = () => {
         circleX = 0;
         circleY = 0;
         circleR = 0;
+        currentX = 0;
+        currentY = 0;
 
         topCanvas.removeEventListener("mousemove", handleMouseMove);
         topCanvas.removeEventListener("mouseup", handleMouseUp);

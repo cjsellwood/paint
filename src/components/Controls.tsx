@@ -18,6 +18,7 @@ const Controls = () => {
         <option value="rectangleOutline">Rectangle Outline</option>
         <option value="circle">Circle</option>
         <option value="circleOutline">Circle Outline</option>
+        <option value="line">Line</option>
       </select>
       <button onClick={() => dispatch(toggleSave())}>Save</button>
     </div>

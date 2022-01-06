@@ -28,8 +28,16 @@ export type CircleOutline = {
   r: number;
 };
 
+export type Line = {
+  type: "line";
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+}
+
 export type Step = {
-  value: Rectangle | RectangleOutline | Circle | CircleOutline;
+  value: Rectangle | RectangleOutline | Circle | CircleOutline | Line;
   color: string;
 };
 

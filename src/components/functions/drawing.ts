@@ -57,3 +57,18 @@ export const drawCircleOutline = (
   context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
   context.stroke();
 };
+
+export const drawLine = (
+  context: CanvasRenderingContext2D,
+  color: string,
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number
+): void => {
+  context.beginPath();
+  context.strokeStyle = color;
+  context.moveTo(startX, startY);
+  context.lineTo(endX, endY);
+  context.stroke();
+};
