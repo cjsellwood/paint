@@ -31,6 +31,7 @@ const drawAllSteps = (
       drawRectangleOutline(
         context,
         step.color,
+        step.value.thickness,
         step.value.left,
         step.value.top,
         step.value.width,
@@ -42,6 +43,7 @@ const drawAllSteps = (
       drawCircleOutline(
         context,
         step.color,
+        step.value.thickness,
         step.value.x,
         step.value.y,
         step.value.r
@@ -50,6 +52,7 @@ const drawAllSteps = (
       drawLine(
         context,
         step.color,
+        step.value.thickness,
         step.value.startX,
         step.value.startY,
         step.value.endX,

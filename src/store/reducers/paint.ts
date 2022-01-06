@@ -8,6 +8,7 @@ export type Rectangle = {
 
 export type RectangleOutline = {
   type: "rectangleOutline";
+  thickness: number;
   left: number;
   top: number;
   width: number;
@@ -23,6 +24,7 @@ export type Circle = {
 
 export type CircleOutline = {
   type: "circleOutline";
+  thickness: number;
   x: number;
   y: number;
   r: number;
@@ -30,6 +32,7 @@ export type CircleOutline = {
 
 export type Line = {
   type: "line";
+  thickness: number;
   startX: number;
   startY: number;
   endX: number;
@@ -47,6 +50,7 @@ type State = {
   tool: string;
   save: boolean;
   undoIndex: number;
+  thickness: number;
 };
 
 const initialState: State = {
@@ -55,6 +59,7 @@ const initialState: State = {
   tool: "rectangle",
   save: false,
   undoIndex: 0,
+  thickness: 1,
 };
 
 type Action =
@@ -70,7 +75,8 @@ type Action =
   | { type: "SET_TOOL"; tool: string }
   | { type: "TOGGLE_SAVE" }
   | { type: "UNDO" }
-  | { type: "REDO" };
+  | { type: "REDO" }
+  | { type: "SET_THICKNESS"; thickness: number };
 
 const reducer = (state = initialState, action: Action) => {
   switch (action.type) {
@@ -119,6 +125,12 @@ const reducer = (state = initialState, action: Action) => {
       return {
         ...state,
         undoIndex: state.undoIndex - 1,
+      };
+    case "SET_THICKNESS":
+      console.log(action.thickness);
+      return {
+        ...state,
+        thickness: action.thickness,
       };
     default:
       return state;

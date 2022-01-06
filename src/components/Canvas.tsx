@@ -18,8 +18,9 @@ import { Step } from "../store/reducers/paint";
 const Canvas = () => {
   const ref = useRef(null);
   const topLayerRef = useRef(null);
+
   const dispatch = useDispatch();
-  const { steps, tool, color, save, undoIndex } = useSelector(
+  const { steps, tool, color, save, undoIndex, thickness } = useSelector(
     (state: RootState) => state.paint
   );
 
@@ -40,6 +41,12 @@ const Canvas = () => {
   useEffect(() => {
     toolRef.current = tool;
   }, [tool]);
+
+  // Use ref for line thickness
+  const thicknessRef = useRef(thickness);
+  useEffect(() => {
+    thicknessRef.current = thickness;
+  }, [thickness]);
 
   useEffect(() => {
     // Load canvas and resize canvas to fit screen
@@ -135,6 +142,7 @@ const Canvas = () => {
             drawRectangleOutline(
               topContext,
               colorRef.current,
+              thicknessRef.current,
               minLeft,
               minTop,
               newWidth,
@@ -148,6 +156,7 @@ const Canvas = () => {
             drawCircleOutline(
               topContext,
               colorRef.current,
+              thicknessRef.current,
               circleX,
               circleY,
               circleR
@@ -157,6 +166,7 @@ const Canvas = () => {
             drawLine(
               topContext,
               colorRef.current,
+              thicknessRef.current,
               startX,
               startY,
               currentX,
@@ -201,6 +211,7 @@ const Canvas = () => {
             color: colorRef.current,
             value: {
               type: "rectangleOutline",
+              thickness: thicknessRef.current,
               left: minLeft,
               top: minTop,
               width: newWidth,
@@ -224,6 +235,7 @@ const Canvas = () => {
             color: colorRef.current,
             value: {
               type: "circleOutline",
+              thickness: thicknessRef.current,
               x: circleX,
               y: circleY,
               r: circleR,
@@ -235,6 +247,7 @@ const Canvas = () => {
             color: colorRef.current,
             value: {
               type: "line",
+              thickness: thicknessRef.current,
               startX,
               startY,
               endX: currentX,
@@ -306,6 +319,7 @@ const Canvas = () => {
     topCanvas.addEventListener("mouseenter", handleMouseEnter);
   }, [dispatch]);
 
+  // Save drawing as png
   useEffect(() => {
     if (save) {
       const canvas = ref.current! as HTMLCanvasElement;
@@ -318,13 +332,14 @@ const Canvas = () => {
     }
   }, [dispatch, save]);
 
+  // Redraw canvas with different less or more steps when pressing undo/redo
   useEffect(() => {
     const canvas = ref.current! as HTMLCanvasElement;
     const context = canvas.getContext("2d")!;
     clearCanvas(canvas);
     drawBackground(canvas);
     drawAllSteps(context, steps.slice(0, steps.length - undoIndex));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [undoIndex]);
 
   return (

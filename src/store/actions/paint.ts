@@ -45,3 +45,10 @@ export const redo = () => {
     type: "REDO",
   };
 };
+
+export const setThickness = (thickness: number) => {
+  return {
+    type: "SET_THICKNESS",
+    thickness,
+  };
+};

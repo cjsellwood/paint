@@ -23,11 +23,13 @@ export const drawRectangle = (
 export const drawRectangleOutline = (
   context: CanvasRenderingContext2D,
   color: string,
+  thickness: number,
   x: number,
   y: number,
   width: number,
   height: number
 ): void => {
+  context.lineWidth = thickness;
   context.strokeStyle = color;
   context.strokeRect(x, y, width, height);
 };
@@ -48,12 +50,14 @@ export const drawCircle = (
 export const drawCircleOutline = (
   context: CanvasRenderingContext2D,
   color: string,
+  thickness: number,
   centerX: number,
   centerY: number,
   radius: number
 ): void => {
   context.beginPath();
   context.strokeStyle = color;
+  context.lineWidth = thickness;
   context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
   context.stroke();
 };
@@ -61,6 +65,7 @@ export const drawCircleOutline = (
 export const drawLine = (
   context: CanvasRenderingContext2D,
   color: string,
+  thickness: number,
   startX: number,
   startY: number,
   endX: number,
@@ -68,8 +73,8 @@ export const drawLine = (
 ): void => {
   context.beginPath();
   context.strokeStyle = color;
+  context.lineWidth = thickness;
   context.moveTo(startX, startY);
   context.lineTo(endX, endY);
   context.stroke();
 };
-

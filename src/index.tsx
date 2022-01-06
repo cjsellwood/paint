@@ -16,6 +16,7 @@ export interface RootState {
     tool: string;
     save: boolean;
     undoIndex: number;
+    thickness: number;
   };
 }
 
