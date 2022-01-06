@@ -13,6 +13,7 @@ export interface RootState {
   paint: {
     steps: Step[];
     color: string;
+    tool: string;
   };
 }
 
