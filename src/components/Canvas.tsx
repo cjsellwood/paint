@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import classes from "./Canvas.module.css";
-import { saveStep, blankStep } from "../store/actions/paint";
+import { saveStep, blankStep, toggleSave } from "../store/actions/paint";
 import { RootState } from "../index";
 import {
   drawRectangle,
@@ -15,7 +15,9 @@ const Canvas = () => {
   const ref = useRef(null);
   const topLayerRef = useRef(null);
   const dispatch = useDispatch();
-  const { steps, tool, color } = useSelector((state: RootState) => state.paint);
+  const { steps, tool, color, save } = useSelector(
+    (state: RootState) => state.paint
+  );
 
   // Use ref for colors to pass updated colours to event listeners
   const colorRef = useRef(color);
@@ -286,8 +288,6 @@ const Canvas = () => {
           );
         }
 
-        console.log(context.getImageData(0, 0, canvas.width, canvas.height))
-
         // Reset variables
         minLeft = 0;
         minTop = 0;
@@ -335,7 +335,17 @@ const Canvas = () => {
     topCanvas.addEventListener("mouseenter", handleMouseEnter);
   }, [dispatch]);
 
-  
+  useEffect(() => {
+    if (save) {
+      let canvas = ref.current! as HTMLCanvasElement;
+      const dataUrl = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.download = "Paint";
+      link.href = dataUrl;
+      link.click();
+      dispatch(toggleSave());
+    }
+  }, [dispatch, save]);
 
   return (
     <React.Fragment>

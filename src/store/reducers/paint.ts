@@ -37,12 +37,14 @@ type State = {
   steps: Step[];
   color: string;
   tool: string;
+  save: boolean;
 };
 
 const initialState: State = {
   steps: [],
   color: "#000000",
   tool: "rectangle",
+  save: false,
 };
 
 type Action =
@@ -55,7 +57,8 @@ type Action =
       type: "BLANK_STEP";
     }
   | { type: "SET_COLOR"; color: string }
-  | { type: "SET_TOOL"; tool: string };
+  | { type: "SET_TOOL"; tool: string }
+  | { type: "TOGGLE_SAVE" };
 
 const reducer = (state = initialState, action: Action) => {
   switch (action.type) {
@@ -78,6 +81,11 @@ const reducer = (state = initialState, action: Action) => {
       return {
         ...state,
         tool: action.tool,
+      };
+    case "TOGGLE_SAVE":
+      return {
+        ...state,
+        save: !state.save,
       };
     default:
       return state;

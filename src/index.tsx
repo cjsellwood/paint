@@ -14,6 +14,7 @@ export interface RootState {
     steps: Step[];
     color: string;
     tool: string;
+    save: boolean;
   };
 }
 

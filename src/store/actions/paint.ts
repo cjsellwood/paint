@@ -28,8 +28,8 @@ export const setTool = (tool: string) => {
   };
 };
 
-export const saveImage = () => {
+export const toggleSave = () => {
   return {
-    type: "SAVE_IMAGE",
+    type: "TOGGLE_SAVE",
   };
 };

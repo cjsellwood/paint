@@ -1,7 +1,6 @@
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../index";
-import { setColor, setTool } from "../store/actions/paint";
+import { setColor, setTool, toggleSave } from "../store/actions/paint";
 
 const Controls = () => {
   const tool = useSelector((state: RootState) => state.paint.tool);
@@ -20,6 +19,7 @@ const Controls = () => {
         <option value="circle">Circle</option>
         <option value="circleOutline">Circle Outline</option>
       </select>
+      <button onClick={() => dispatch(toggleSave())}>Save</button>
     </div>
   );
 };
