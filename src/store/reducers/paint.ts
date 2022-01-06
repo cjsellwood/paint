@@ -1,5 +1,13 @@
 export type Rectangle = {
-  type: "Rectangle";
+  type: "rectangle";
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+export type RectangleOutline = {
+  type: "rectangleOutline";
   left: number;
   top: number;
   width: number;
@@ -7,14 +15,21 @@ export type Rectangle = {
 };
 
 export type Circle = {
-  type: "Circle";
+  type: "circle";
+  x: number;
+  y: number;
+  r: number;
+};
+
+export type CircleOutline = {
+  type: "circleOutline";
   x: number;
   y: number;
   r: number;
 };
 
 export type Step = {
-  value: Rectangle | Circle;
+  value: Rectangle | RectangleOutline | Circle | CircleOutline;
   color: string;
 };
 
@@ -27,13 +42,13 @@ type State = {
 const initialState: State = {
   steps: [],
   color: "#000000",
-  tool: "Rectangle",
+  tool: "rectangle",
 };
 
 type Action =
   | {
       type: "SAVE_STEP";
-      value: Rectangle | Circle;
+      value: Rectangle | RectangleOutline | Circle | CircleOutline;
       color: string;
     }
   | {

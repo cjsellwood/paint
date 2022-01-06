@@ -27,3 +27,9 @@ export const setTool = (tool: string) => {
     tool,
   };
 };
+
+export const saveImage = () => {
+  return {
+    type: "SAVE_IMAGE",
+  };
+};

@@ -3,7 +3,13 @@ import { useSelector, useDispatch } from "react-redux";
 import classes from "./Canvas.module.css";
 import { saveStep, blankStep } from "../store/actions/paint";
 import { RootState } from "../index";
-import { drawCircle, drawRectangle, clearCanvas } from "./functions/drawing";
+import {
+  drawRectangle,
+  drawRectangleOutline,
+  drawCircle,
+  drawCircleOutline,
+  clearCanvas,
+} from "./functions/drawing";
 
 const Canvas = () => {
   const ref = useRef(null);
@@ -21,7 +27,6 @@ const Canvas = () => {
   const stepsRef = useRef(steps);
   useEffect(() => {
     stepsRef.current = steps;
-    console.log(steps);
   }, [steps]);
 
   // Use ref for tool to pass updated tool selection to event listeners
@@ -69,16 +74,17 @@ const Canvas = () => {
       const startY = e.y - top;
 
       const handleMouseMove = (e2: MouseEvent) => {
+        clearCanvas(topCanvas);
+
         // Get mouse current position
         const currentX = e2.clientX - left;
         const currentY = e2.clientY - top;
 
-        // Set color from state
-        topContext.fillStyle = colorRef.current;
-        // topContext.clearRect(0, 0, topCanvas.width, topCanvas.height);
-        clearCanvas(topCanvas);
-
-        if (toolRef.current === "Rectangle") {
+        // Calculate necessary variables for rectangles
+        if (
+          toolRef.current === "rectangle" ||
+          toolRef.current === "rectangleOutline"
+        ) {
           // Get lowest left coordinate and top coordinate
           minLeft = Math.min(currentX, startX);
           minTop = Math.min(currentY, startY);
@@ -86,17 +92,13 @@ const Canvas = () => {
           // Calculate width and height of rectangle
           newWidth = Math.abs(startX - currentX);
           newHeight = Math.abs(startY - currentY);
+        }
 
-          drawRectangle(
-            topContext,
-            colorRef.current,
-            minLeft,
-            minTop,
-            newWidth,
-            newHeight
-          );
-        } else if (toolRef.current === "Circle") {
-          // Calculate radius of circle and centerpoint
+        // Calculate radius of circle and centerpoint
+        if (
+          toolRef.current === "circle" ||
+          toolRef.current === "circleOutline"
+        ) {
           circleR =
             Math.max(Math.abs(startX - currentX), Math.abs(startY - currentY)) /
             2;
@@ -104,14 +106,50 @@ const Canvas = () => {
             Math.min(startX, currentX) + Math.abs(startX - currentX) / 2;
           circleY =
             Math.min(startY, currentY) + Math.abs(startY - currentY) / 2;
-          drawCircle(topContext, colorRef.current, circleX, circleY, circleR);
+        }
+
+        switch (toolRef.current) {
+          case "rectangle":
+            drawRectangle(
+              topContext,
+              colorRef.current,
+              minLeft,
+              minTop,
+              newWidth,
+              newHeight
+            );
+            break;
+          case "rectangleOutline":
+            drawRectangleOutline(
+              topContext,
+              colorRef.current,
+              minLeft,
+              minTop,
+              newWidth,
+              newHeight
+            );
+            break;
+          case "circle":
+            drawCircle(topContext, colorRef.current, circleX, circleY, circleR);
+            break;
+          case "circleOutline":
+            drawCircleOutline(
+              topContext,
+              colorRef.current,
+              circleX,
+              circleY,
+              circleR
+            );
+            break;
+          default:
+            break;
         }
       };
 
       const handleMouseUp = (e: MouseEvent) => {
-        // Save final rectangle to state if one was drawn
+        // Save final shape to state if one was drawn
         if (
-          toolRef.current === "Rectangle" &&
+          toolRef.current === "rectangle" &&
           minLeft &&
           minTop &&
           newWidth &&
@@ -121,7 +159,7 @@ const Canvas = () => {
             saveStep({
               color: colorRef.current,
               value: {
-                type: "Rectangle",
+                type: "rectangle",
                 left: minLeft,
                 top: minTop,
                 width: newWidth,
@@ -129,12 +167,43 @@ const Canvas = () => {
               },
             })
           );
-        } else if (toolRef.current === "Circle" && circleR) {
+        } else if (
+          toolRef.current === "rectangleOutline" &&
+          minLeft &&
+          minTop &&
+          newWidth &&
+          newHeight
+        ) {
           dispatch(
             saveStep({
               color: colorRef.current,
               value: {
-                type: "Circle",
+                type: "rectangleOutline",
+                left: minLeft,
+                top: minTop,
+                width: newWidth,
+                height: newHeight,
+              },
+            })
+          );
+        } else if (toolRef.current === "circle" && circleR) {
+          dispatch(
+            saveStep({
+              color: colorRef.current,
+              value: {
+                type: "circle",
+                x: circleX,
+                y: circleY,
+                r: circleR,
+              },
+            })
+          );
+        } else if (toolRef.current === "circleOutline" && circleR) {
+          dispatch(
+            saveStep({
+              color: colorRef.current,
+              value: {
+                type: "circleOutline",
                 x: circleX,
                 y: circleY,
                 r: circleR,
@@ -149,7 +218,7 @@ const Canvas = () => {
         // Clear canvas and redraw from steps saved in state
         clearCanvas(canvas);
         for (let step of stepsRef.current) {
-          if (step.value.type === "Rectangle") {
+          if (step.value.type === "rectangle") {
             drawRectangle(
               context,
               step.color,
@@ -158,8 +227,25 @@ const Canvas = () => {
               step.value.width,
               step.value.height
             );
-          } else if (step.value.type === "Circle") {
+          } else if (step.value.type === "rectangleOutline") {
+            drawRectangleOutline(
+              context,
+              step.color,
+              step.value.left,
+              step.value.top,
+              step.value.width,
+              step.value.height
+            );
+          } else if (step.value.type === "circle") {
             drawCircle(
+              context,
+              step.color,
+              step.value.x,
+              step.value.y,
+              step.value.r
+            );
+          } else if (step.value.type === "circleOutline") {
+            drawCircleOutline(
               context,
               step.color,
               step.value.x,
@@ -170,7 +256,7 @@ const Canvas = () => {
         }
 
         // Add newest drawing to bottom canvas
-        if (toolRef.current === "Rectangle") {
+        if (toolRef.current === "rectangle") {
           drawRectangle(
             context,
             colorRef.current,
@@ -179,9 +265,28 @@ const Canvas = () => {
             newWidth,
             newHeight
           );
-        } else if (toolRef.current === "Circle") {
+        } else if (toolRef.current === "rectangleOutline") {
+          drawRectangleOutline(
+            context,
+            colorRef.current,
+            minLeft,
+            minTop,
+            newWidth,
+            newHeight
+          );
+        } else if (toolRef.current === "circle") {
           drawCircle(context, colorRef.current, circleX, circleY, circleR);
+        } else if (toolRef.current === "circleOutline") {
+          drawCircleOutline(
+            context,
+            colorRef.current,
+            circleX,
+            circleY,
+            circleR
+          );
         }
+
+        console.log(context.getImageData(0, 0, canvas.width, canvas.height))
 
         // Reset variables
         minLeft = 0;
@@ -229,6 +334,8 @@ const Canvas = () => {
 
     topCanvas.addEventListener("mouseenter", handleMouseEnter);
   }, [dispatch]);
+
+  
 
   return (
     <React.Fragment>
