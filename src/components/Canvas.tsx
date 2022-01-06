@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import classes from "./Canvas.module.css";
 import { saveStep, blankStep } from "../store/actions/paint";
 import { RootState } from "../index";
+import { drawCircle, drawRectangle, clearCanvas } from "./functions/drawing";
 
 const Canvas = () => {
   const ref = useRef(null);
@@ -74,7 +75,8 @@ const Canvas = () => {
 
         // Set color from state
         topContext.fillStyle = colorRef.current;
-        topContext.clearRect(0, 0, topCanvas.width, topCanvas.height);
+        // topContext.clearRect(0, 0, topCanvas.width, topCanvas.height);
+        clearCanvas(topCanvas);
 
         if (toolRef.current === "Rectangle") {
           // Get lowest left coordinate and top coordinate
@@ -84,14 +86,25 @@ const Canvas = () => {
           // Calculate width and height of rectangle
           newWidth = Math.abs(startX - currentX);
           newHeight = Math.abs(startY - currentY);
-          topContext.fillRect(minLeft, minTop, newWidth, newHeight);
+
+          drawRectangle(
+            topContext,
+            colorRef.current,
+            minLeft,
+            minTop,
+            newWidth,
+            newHeight
+          );
         } else if (toolRef.current === "Circle") {
-          circleR = Math.abs(startX - currentX) / 2;
-          circleX = Math.min(startX, currentX) + circleR;
-          circleY = Math.min(startY, currentY) + circleR;
-          topContext.beginPath();
-          topContext.arc(circleX, circleY, circleR, 0, 2 * Math.PI, true);
-          topContext.fill();
+          // Calculate radius of circle and centerpoint
+          circleR =
+            Math.max(Math.abs(startX - currentX), Math.abs(startY - currentY)) /
+            2;
+          circleX =
+            Math.min(startX, currentX) + Math.abs(startX - currentX) / 2;
+          circleY =
+            Math.min(startY, currentY) + Math.abs(startY - currentY) / 2;
+          drawCircle(topContext, colorRef.current, circleX, circleY, circleR);
         }
       };
 
@@ -133,61 +146,44 @@ const Canvas = () => {
           dispatch(blankStep());
         }
 
-        // Stop listening to mouse movements and reset dimensions
-        topCanvas.removeEventListener("mousemove", handleMouseMove);
-        minLeft = 0;
-        minTop = 0;
-        newWidth = 0;
-        newHeight = 0;
-        circleX = 0;
-        circleY = 0;
-        circleR = 0;
-
         // Clear canvas and redraw from steps saved in state
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
+        clearCanvas(canvas);
         for (let step of stepsRef.current) {
           if (step.value.type === "Rectangle") {
-            context.fillStyle = step.color;
-            context.fillRect(
+            drawRectangle(
+              context,
+              step.color,
               step.value.left,
               step.value.top,
               step.value.width,
               step.value.height
             );
           } else if (step.value.type === "Circle") {
-            console.log(step);
-            context.fillStyle = step.color;
-            context.beginPath();
-            context.arc(
+            drawCircle(
+              context,
+              step.color,
               step.value.x,
               step.value.y,
-              step.value.r,
-              0,
-              2 * Math.PI,
-              true
+              step.value.r
             );
-            context.fill();
           }
         }
 
         // Add newest drawing to bottom canvas
-        context.fillStyle = colorRef.current;
-
         if (toolRef.current === "Rectangle") {
-          context.fillRect(minLeft, minTop, newWidth, newHeight);
+          drawRectangle(
+            context,
+            colorRef.current,
+            minLeft,
+            minTop,
+            newWidth,
+            newHeight
+          );
         } else if (toolRef.current === "Circle") {
-          context.beginPath();
-          context.arc(circleX, circleY, circleR, 0, 2 * Math.PI, true);
-          context.fill();
+          drawCircle(context, colorRef.current, circleX, circleY, circleR);
         }
-        topCanvas.removeEventListener("mouseup", handleMouseUp);
-        topCanvas.removeEventListener("mouseleave", handleMouseLeave);
-      };
 
-      // If mouse leaves canvas cancel drawing and reset canvas
-      const handleMouseLeave = (e: MouseEvent) => {
-        topContext.clearRect(0, 0, topCanvas.width, topCanvas.height);
+        // Reset variables
         minLeft = 0;
         minTop = 0;
         newWidth = 0;
@@ -195,6 +191,25 @@ const Canvas = () => {
         circleX = 0;
         circleY = 0;
         circleR = 0;
+
+        // Stop listening to mouse movements
+        topCanvas.removeEventListener("mousemove", handleMouseMove);
+        topCanvas.removeEventListener("mouseup", handleMouseUp);
+        topCanvas.removeEventListener("mouseleave", handleMouseLeave);
+      };
+
+      // If mouse leaves canvas cancel drawing and reset canvas
+      const handleMouseLeave = () => {
+        clearCanvas(topCanvas);
+
+        minLeft = 0;
+        minTop = 0;
+        newWidth = 0;
+        newHeight = 0;
+        circleX = 0;
+        circleY = 0;
+        circleR = 0;
+
         topCanvas.removeEventListener("mousemove", handleMouseMove);
         topCanvas.removeEventListener("mouseup", handleMouseUp);
         topCanvas.removeEventListener("mouseleave", handleMouseLeave);
