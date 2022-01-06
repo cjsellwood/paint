@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../index";
-import { setColor, setTool, toggleSave } from "../store/actions/paint";
+import { setColor, setTool, toggleSave, undo, redo } from "../store/actions/paint";
 
 const Controls = () => {
   const tool = useSelector((state: RootState) => state.paint.tool);
@@ -21,6 +21,8 @@ const Controls = () => {
         <option value="line">Line</option>
       </select>
       <button onClick={() => dispatch(toggleSave())}>Save</button>
+      <button onClick={() => dispatch(undo())}>Undo</button>
+      <button onClick={() => dispatch(redo())}>Redo</button>
     </div>
   );
 };

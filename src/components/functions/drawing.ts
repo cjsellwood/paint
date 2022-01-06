@@ -72,3 +72,4 @@ export const drawLine = (
   context.lineTo(endX, endY);
   context.stroke();
 };
+

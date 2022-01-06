@@ -33,3 +33,15 @@ export const toggleSave = () => {
     type: "TOGGLE_SAVE",
   };
 };
+
+export const undo = () => {
+  return {
+    type: "UNDO",
+  };
+};
+
+export const redo = () => {
+  return {
+    type: "REDO",
+  };
+};

@@ -12,12 +12,14 @@ import {
   drawBackground,
   drawLine,
 } from "./functions/drawing";
+import drawAllSteps from "./functions/drawAllSteps";
+import { Step } from "../store/reducers/paint";
 
 const Canvas = () => {
   const ref = useRef(null);
   const topLayerRef = useRef(null);
   const dispatch = useDispatch();
-  const { steps, tool, color, save } = useSelector(
+  const { steps, tool, color, save, undoIndex } = useSelector(
     (state: RootState) => state.paint
   );
 
@@ -41,20 +43,20 @@ const Canvas = () => {
 
   useEffect(() => {
     // Load canvas and resize canvas to fit screen
-    let canvas = ref.current! as HTMLCanvasElement;
+    const canvas = ref.current! as HTMLCanvasElement;
 
     // Resize canvas to fit screen
     canvas.width = window.innerWidth - 20;
     canvas.height = window.innerHeight - 170;
 
-    let topCanvas = topLayerRef.current! as HTMLCanvasElement;
+    const topCanvas = topLayerRef.current! as HTMLCanvasElement;
     topCanvas.width = window.innerWidth - 20;
     topCanvas.height = window.innerHeight - 170;
   }, []);
 
   useEffect(() => {
     // Load canvas and rendering context
-    let canvas = ref.current! as HTMLCanvasElement;
+    const canvas = ref.current! as HTMLCanvasElement;
     const context = canvas.getContext("2d")!;
 
     // Add white background
@@ -69,7 +71,7 @@ const Canvas = () => {
     let circleY: number;
     let circleR: number;
 
-    let topCanvas = topLayerRef.current! as HTMLCanvasElement;
+    const topCanvas = topLayerRef.current! as HTMLCanvasElement;
     const topContext = topCanvas.getContext("2d")!;
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -167,7 +169,9 @@ const Canvas = () => {
       };
 
       const handleMouseUp = (e: MouseEvent) => {
-        // Save final shape to state if one was drawn
+        // Create object of new step from drawing and save to state
+        let newStep: Step | undefined;
+
         if (
           toolRef.current === "rectangle" &&
           minLeft &&
@@ -175,18 +179,17 @@ const Canvas = () => {
           newWidth &&
           newHeight
         ) {
-          dispatch(
-            saveStep({
-              color: colorRef.current,
-              value: {
-                type: "rectangle",
-                left: minLeft,
-                top: minTop,
-                width: newWidth,
-                height: newHeight,
-              },
-            })
-          );
+          newStep = {
+            color: colorRef.current,
+            value: {
+              type: "rectangle",
+              left: minLeft,
+              top: minTop,
+              width: newWidth,
+              height: newHeight,
+            },
+          };
+          dispatch(saveStep(newStep));
         } else if (
           toolRef.current === "rectangleOutline" &&
           minLeft &&
@@ -194,55 +197,51 @@ const Canvas = () => {
           newWidth &&
           newHeight
         ) {
-          dispatch(
-            saveStep({
-              color: colorRef.current,
-              value: {
-                type: "rectangleOutline",
-                left: minLeft,
-                top: minTop,
-                width: newWidth,
-                height: newHeight,
-              },
-            })
-          );
+          newStep = {
+            color: colorRef.current,
+            value: {
+              type: "rectangleOutline",
+              left: minLeft,
+              top: minTop,
+              width: newWidth,
+              height: newHeight,
+            },
+          };
+          dispatch(saveStep(newStep));
         } else if (toolRef.current === "circle" && circleR) {
-          dispatch(
-            saveStep({
-              color: colorRef.current,
-              value: {
-                type: "circle",
-                x: circleX,
-                y: circleY,
-                r: circleR,
-              },
-            })
-          );
+          newStep = {
+            color: colorRef.current,
+            value: {
+              type: "circle",
+              x: circleX,
+              y: circleY,
+              r: circleR,
+            },
+          };
+          dispatch(saveStep(newStep));
         } else if (toolRef.current === "circleOutline" && circleR) {
-          dispatch(
-            saveStep({
-              color: colorRef.current,
-              value: {
-                type: "circleOutline",
-                x: circleX,
-                y: circleY,
-                r: circleR,
-              },
-            })
-          );
-        } else if (toolRef.current === "line") {
-          dispatch(
-            saveStep({
-              color: colorRef.current,
-              value: {
-                type: "line",
-                startX,
-                startY,
-                endX: currentX,
-                endY: currentY,
-              },
-            })
-          );
+          newStep = {
+            color: colorRef.current,
+            value: {
+              type: "circleOutline",
+              x: circleX,
+              y: circleY,
+              r: circleR,
+            },
+          };
+          dispatch(saveStep(newStep));
+        } else if (toolRef.current === "line" && currentX && currentY) {
+          newStep = {
+            color: colorRef.current,
+            value: {
+              type: "line",
+              startX,
+              startY,
+              endX: currentX,
+              endY: currentY,
+            },
+          };
+          dispatch(saveStep(newStep));
         } else {
           // Add no step but modify so that useEffect runs again
           dispatch(blankStep());
@@ -251,92 +250,10 @@ const Canvas = () => {
         // Clear canvas and redraw from steps saved in state
         clearCanvas(canvas);
         drawBackground(canvas);
-        for (let step of stepsRef.current) {
-          if (step.value.type === "rectangle") {
-            drawRectangle(
-              context,
-              step.color,
-              step.value.left,
-              step.value.top,
-              step.value.width,
-              step.value.height
-            );
-          } else if (step.value.type === "rectangleOutline") {
-            drawRectangleOutline(
-              context,
-              step.color,
-              step.value.left,
-              step.value.top,
-              step.value.width,
-              step.value.height
-            );
-          } else if (step.value.type === "circle") {
-            drawCircle(
-              context,
-              step.color,
-              step.value.x,
-              step.value.y,
-              step.value.r
-            );
-          } else if (step.value.type === "circleOutline") {
-            drawCircleOutline(
-              context,
-              step.color,
-              step.value.x,
-              step.value.y,
-              step.value.r
-            );
-          } else if (step.value.type === "line") {
-            drawLine(
-              context,
-              step.color,
-              step.value.startX,
-              step.value.startY,
-              step.value.endX,
-              step.value.endY
-            );
-          }
-        }
 
-        // Add newest drawing to bottom canvas
-        if (toolRef.current === "rectangle") {
-          drawRectangle(
-            context,
-            colorRef.current,
-            minLeft,
-            minTop,
-            newWidth,
-            newHeight
-          );
-        } else if (toolRef.current === "rectangleOutline") {
-          drawRectangleOutline(
-            context,
-            colorRef.current,
-            minLeft,
-            minTop,
-            newWidth,
-            newHeight
-          );
-        } else if (toolRef.current === "circle") {
-          drawCircle(context, colorRef.current, circleX, circleY, circleR);
-        } else if (toolRef.current === "circleOutline") {
-          drawCircleOutline(
-            context,
-            colorRef.current,
-            circleX,
-            circleY,
-            circleR
-          );
-        } else if (toolRef.current === "line") {
-          drawLine(
-            context,
-            colorRef.current,
-            startX,
-            startY,
-            currentX,
-            currentY
-          );
-        }
+        drawAllSteps(context, stepsRef.current, newStep);
+
+        clearCanvas(topCanvas);
 
         // Reset variables
         minLeft = 0;
@@ -391,7 +308,7 @@ const Canvas = () => {
 
   useEffect(() => {
     if (save) {
-      let canvas = ref.current! as HTMLCanvasElement;
+      const canvas = ref.current! as HTMLCanvasElement;
       const dataUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.download = "Paint";
@@ -400,6 +317,15 @@ const Canvas = () => {
       dispatch(toggleSave());
     }
   }, [dispatch, save]);
+
+  useEffect(() => {
+    const canvas = ref.current! as HTMLCanvasElement;
+    const context = canvas.getContext("2d")!;
+    clearCanvas(canvas);
+    drawBackground(canvas);
+    drawAllSteps(context, steps.slice(0, steps.length - undoIndex));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [undoIndex]);
 
   return (
     <React.Fragment>

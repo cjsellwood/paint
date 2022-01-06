@@ -15,6 +15,7 @@ export interface RootState {
     color: string;
     tool: string;
     save: boolean;
+    undoIndex: number;
   };
 }
 
