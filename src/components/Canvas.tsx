@@ -353,18 +353,20 @@ const Canvas = () => {
       const clickX = e.x - left;
       const clickY = e.y - top;
 
-      fill(canvas, colorRef.current, clickX, clickY);
+      const isFilled = fill(canvas, colorRef.current, clickX, clickY);
 
-      dispatch(
-        saveStep({
-          color: colorRef.current,
-          value: {
-            type: "fill",
-            x: clickX,
-            y: clickY,
-          },
-        })
-      );
+      if (isFilled) {
+        dispatch(
+          saveStep({
+            color: colorRef.current,
+            value: {
+              type: "fill",
+              x: clickX,
+              y: clickY,
+            },
+          })
+        );
+      }
     };
 
     // Add mouse down listener when cursor enters canvas

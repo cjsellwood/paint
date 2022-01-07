@@ -111,15 +111,18 @@ export const fill = (
   const g = parseInt(color.slice(3, 5), 16);
   const b = parseInt(color.slice(5, 7), 16);
 
+  // Get index of pixels in image
   const getIndex = (x: number, y: number, width: number) => {
     const pixel = y * (width * 4) + x * 4;
     return [pixel, pixel + 1, pixel + 2, pixel + 3];
   };
 
+  // Check if clicked pixel colour is same as desired colour
   const isColored = (rImage: number, gImage: number, bImage: number) => {
     return rImage === r && gImage === g && bImage === b && rImage;
   };
 
+  // Get colors of chosen pixel
   const getColors = (rIndex: number, gIndex: number, bIndex: number) => {
     return [
       imageData.data[rIndex],
@@ -139,6 +142,11 @@ export const fill = (
     gClickedIndex,
     bClickedIndex
   );
+
+  // Return if pixel clicked already desired colour
+  if (rClicked === r && gClicked === g && bClicked === b) {
+    return false;
+  }
 
   const fillPixels = (x: number, y: number) => {
     let queue = [];
@@ -177,4 +185,5 @@ export const fill = (
   fillPixels(x, y);
 
   context.putImageData(imageData, 0, 0);
+  return true;
 };
