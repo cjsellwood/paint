@@ -12,6 +12,7 @@ import {
   drawBackground,
   drawLine,
   drawPencil,
+  fill,
 } from "./functions/drawing";
 import drawAllSteps from "./functions/drawAllSteps";
 import { Step } from "../store/reducers/paintTypes";
@@ -35,7 +36,6 @@ const Canvas = () => {
   const stepsRef = useRef(steps);
   useEffect(() => {
     stepsRef.current = steps;
-    console.log(steps);
   }, [steps]);
 
   // Use ref for tool to pass updated tool selection to event listeners
@@ -66,7 +66,6 @@ const Canvas = () => {
   useEffect(() => {
     // Load canvas and rendering context
     const canvas = ref.current! as HTMLCanvasElement;
-    const context = canvas.getContext("2d")!;
 
     // Add white background
     drawBackground(canvas);
@@ -296,7 +295,7 @@ const Canvas = () => {
 
         // Clear top canvas and draw new shape on bottom canvas
         clearCanvas(topCanvas);
-        drawAllSteps(context, stepsRef.current, newStep);
+        drawAllSteps(canvas, stepsRef.current, newStep);
 
         // Reset variables
         minLeft = 0;
@@ -345,75 +344,27 @@ const Canvas = () => {
 
     // Listen for just a click for fill tool
     const handleMouseClick = (e: MouseEvent) => {
-      const bottomCanvas = ref.current! as HTMLCanvasElement;
-      const bottomContext = bottomCanvas.getContext("2d")!;
-
       if (toolRef.current !== "fill") {
         return;
       }
-      const { left, top } = topCanvas.getBoundingClientRect();
+
+      // Get click coordinates
+      const { left, top } = canvas.getBoundingClientRect();
       const clickX = e.x - left;
       const clickY = e.y - top;
-      const imageData = bottomContext.getImageData(
-        0,
-        0,
-        bottomCanvas.width,
-        bottomCanvas.height
+
+      fill(canvas, colorRef.current, clickX, clickY);
+
+      dispatch(
+        saveStep({
+          color: colorRef.current,
+          value: {
+            type: "fill",
+            x: clickX,
+            y: clickY,
+          },
+        })
       );
-
-      console.log(imageData.data);
-      const r = parseInt(colorRef.current.slice(1, 3), 16);
-      const g = parseInt(colorRef.current.slice(3, 5), 16);
-      const b = parseInt(colorRef.current.slice(5, 7), 16);
-
-      const getIndex = (x: number, y: number, width: number) => {
-        const pixel = y * (width * 4) + x * 4;
-        return [pixel, pixel + 1, pixel + 2, pixel + 3];
-      };
-
-      const isColored = (rImage: number, gImage: number, bImage: number) => {
-        return rImage === r && gImage === g && bImage === b;
-      };
-
-      const getColors = (rIndex: number, gIndex: number, bIndex: number) => {
-        return [
-          imageData.data[rIndex],
-          imageData.data[gIndex],
-          imageData.data[bIndex],
-        ];
-      };
-
-      const fillPixels = (x: number, y: number) => {
-        let queue = [];
-        queue.push([x, y]);
-        while (queue.length) {
-          const n = queue[0] as [number, number];
-          queue.shift();
-          const [rIndex, gIndex, bIndex] = getIndex(n[0], n[1], canvas.width);
-          const [rData, gData, bData] = getColors(rIndex, gIndex, bIndex);
-          if (
-            n[0] >= 0 &&
-            n[0] < canvas.width &&
-            n[1] >= 0 &&
-            n[1] < canvas.height &&
-            !isColored(rData, gData, bData)
-          ) {
-            imageData.data[rIndex] = r;
-            imageData.data[gIndex] = g;
-            imageData.data[bIndex] = b;
-            queue.push(
-              [n[0] - 1, n[1]],
-              [n[0] + 1, n[1]],
-              [n[0], n[1] - 1],
-              [n[0], n[1] + 1]
-            );
-          }
-        }
-      };
-
-      fillPixels(clickX, clickY);
-
-      context.putImageData(imageData, 0, 0);
     };
 
     // Add mouse down listener when cursor enters canvas
@@ -441,10 +392,9 @@ const Canvas = () => {
   // Redraw canvas with different less or more steps when pressing undo/redo
   useEffect(() => {
     const canvas = ref.current! as HTMLCanvasElement;
-    const context = canvas.getContext("2d")!;
     clearCanvas(canvas);
     drawBackground(canvas);
-    drawAllSteps(context, steps.slice(0, steps.length - undoIndex));
+    drawAllSteps(canvas, steps.slice(0, steps.length - undoIndex));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [undoIndex]);
 

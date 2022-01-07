@@ -5,14 +5,16 @@ import {
   drawCircleOutline,
   drawLine,
   drawPencil,
+  fill,
 } from "./drawing";
 import { Step } from "../../store/reducers/paintTypes";
 
 const drawAllSteps = (
-  context: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
   steps: Step[],
   newStep?: Step
 ) => {
+  const context = canvas.getContext("2d")!;
   let stepsCopy = steps;
   // Only Add newly drawn step if added
   if (typeof newStep !== "undefined") {
@@ -67,6 +69,8 @@ const drawAllSteps = (
         step.value.thickness,
         step.value.coordinates
       );
+    } else if (step.value.type === "fill") {
+      fill(canvas, step.color, step.value.x, step.value.y);
     }
   }
 };

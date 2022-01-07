@@ -94,3 +94,87 @@ export const drawPencil = (
   }
   context.closePath();
 };
+
+export const fill = (
+  canvas: HTMLCanvasElement,
+  color: string,
+  x: number,
+  y: number
+) => {
+  const context = canvas.getContext("2d")!;
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+
+  const imageData = context.getImageData(0, 0, canvasWidth, canvasHeight);
+
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+
+  const getIndex = (x: number, y: number, width: number) => {
+    const pixel = y * (width * 4) + x * 4;
+    return [pixel, pixel + 1, pixel + 2, pixel + 3];
+  };
+
+  const isColored = (rImage: number, gImage: number, bImage: number) => {
+    return rImage === r && gImage === g && bImage === b && rImage;
+  };
+
+  const getColors = (rIndex: number, gIndex: number, bIndex: number) => {
+    return [
+      imageData.data[rIndex],
+      imageData.data[gIndex],
+      imageData.data[bIndex],
+    ];
+  };
+
+  const [rClickedIndex, gClickedIndex, bClickedIndex] = getIndex(
+    x,
+    y,
+    canvas.width
+  );
+
+  const [rClicked, gClicked, bClicked] = getColors(
+    rClickedIndex,
+    gClickedIndex,
+    bClickedIndex
+  );
+
+  const fillPixels = (x: number, y: number) => {
+    let queue = [];
+    queue.push([x, y]);
+    while (queue.length) {
+      const n = queue[0] as [number, number];
+      queue.shift();
+      const [rIndex, gIndex, bIndex] = getIndex(n[0], n[1], canvas.width);
+      const [rData, gData, bData] = getColors(rIndex, gIndex, bIndex);
+      // Ensure inside canvas and not already the desired colour and is the same colour as the first clicked pixel
+      if (
+        n[0] >= 0 &&
+        n[0] < canvas.width &&
+        n[1] >= 0 &&
+        n[1] < canvas.height &&
+        !isColored(rData, gData, bData) &&
+        rData === rClicked &&
+        gData === gClicked &&
+        bData === bClicked
+      ) {
+        imageData.data[rIndex] = r;
+        imageData.data[gIndex] = g;
+        imageData.data[bIndex] = b;
+        queue.push(
+          [n[0] - 1, n[1]],
+          [n[0] + 1, n[1]],
+          [n[0], n[1] - 1],
+          [n[0], n[1] + 1]
+        );
+      }
+    }
+  };
+
+
+
+  fillPixels(x, y);
+
+  context.putImageData(imageData, 0, 0);
+};
