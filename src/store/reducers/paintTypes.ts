@@ -45,8 +45,21 @@ export type Pencil = {
   coordinates: { x: number; y: number }[];
 };
 
+export type Fill = {
+  type: "fill";
+  x: number;
+  y: number;
+};
+
 export type Step = {
-  value: Rectangle | RectangleOutline | Circle | CircleOutline | Line | Pencil;
+  value:
+    | Rectangle
+    | RectangleOutline
+    | Circle
+    | CircleOutline
+    | Line
+    | Pencil
+    | Fill;
   color: string;
 };
 
@@ -68,7 +81,8 @@ export type Action =
         | Circle
         | CircleOutline
         | Line
-        | Pencil;
+        | Pencil
+        | Fill;
       color: string;
     }
   | {
