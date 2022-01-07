@@ -35,6 +35,7 @@ const Canvas = () => {
   const stepsRef = useRef(steps);
   useEffect(() => {
     stepsRef.current = steps;
+    console.log(steps);
   }, [steps]);
 
   // Use ref for tool to pass updated tool selection to event listeners
@@ -290,13 +291,9 @@ const Canvas = () => {
           dispatch(blankStep());
         }
 
-        // Clear canvas and redraw from steps saved in state
-        clearCanvas(canvas);
-        drawBackground(canvas);
-
-        drawAllSteps(context, stepsRef.current, newStep);
-
+        // Clear top canvas and draw new shape on bottom canvas
         clearCanvas(topCanvas);
+        drawAllSteps(context, stepsRef.current, newStep);
 
         // Reset variables
         minLeft = 0;

@@ -13,12 +13,13 @@ const drawAllSteps = (
   steps: Step[],
   newStep?: Step
 ) => {
-  // Add newly drawn step if added
+  let stepsCopy = steps;
+  // Only Add newly drawn step if added
   if (typeof newStep !== "undefined") {
-    steps.push(newStep);
+    stepsCopy = [newStep];
   }
 
-  for (let step of steps) {
+  for (let step of stepsCopy) {
     if (step.value.type === "rectangle") {
       drawRectangle(
         context,
