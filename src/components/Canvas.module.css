@@ -1,8 +1,20 @@
+.canvasContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  height: 100vh;
+}
+
 .canvas {
-  box-shadow: 4px 4px 4px rgb(211, 211, 211), -4px -4px 4px rgb(211, 211, 211),
-    4px -4px 4px rgb(211, 211, 211), -4px 4px 4px rgb(211, 211, 211);
+  /* box-shadow: 4px 4px 4px rgb(211, 211, 211), -4px -4px 4px rgb(211, 211, 211), */
+    /* 4px -4px 4px rgb(211, 211, 211), -4px 4px 4px rgb(211, 211, 211); */
+  /* border-right: 1px dashed blue; */
+  /* border-bottom: 1px dashed blue; */
 }
 
 .topLayer {
   position: absolute;
+  /* border-left: 1px dashed red; */
+  /* border-top: 1px dashed red; */
 }

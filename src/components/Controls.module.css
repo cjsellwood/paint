@@ -1,0 +1,18 @@
+.controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  user-select: none;
+  width: 250px;
+  height: 100vh;
+  color: turquoise;
+  font-size: 1.2rem;
+}
+
+.title {
+  font-size: 3rem;
+  height: 50px;
+  font-weight: bold;
+  text-align: center;
+  user-select: none;
+}

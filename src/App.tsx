@@ -5,14 +5,9 @@ import Controls from "./components/Controls";
 
 function App() {
   return (
-    <div className="App">
-      <h1 className={classes.title}>Paint</h1>
-      <div className={classes.canvasContainer}>
-        <Canvas />
-      </div>
-      <div className={classes.controls}>
-        <Controls />
-      </div>
+    <div className={classes.App}>
+      <Controls />
+      <Canvas />
     </div>
   );
 }

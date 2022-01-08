@@ -55,12 +55,12 @@ const Canvas = () => {
     const canvas = ref.current! as HTMLCanvasElement;
 
     // Resize canvas to fit screen
-    canvas.width = window.innerWidth - 20;
-    canvas.height = window.innerHeight - 170;
+    canvas.width = window.innerWidth - 250;
+    canvas.height = window.innerHeight - 20;
 
     const topCanvas = topLayerRef.current! as HTMLCanvasElement;
-    topCanvas.width = window.innerWidth - 20;
-    topCanvas.height = window.innerHeight - 170;
+    topCanvas.width = window.innerWidth - 250;
+    topCanvas.height = window.innerHeight - 20;
   }, []);
 
   useEffect(() => {
@@ -401,10 +401,10 @@ const Canvas = () => {
   }, [undoIndex]);
 
   return (
-    <React.Fragment>
+    <div className={classes.canvasContainer}>
       <canvas ref={ref} className={classes.canvas}></canvas>
       <canvas ref={topLayerRef} className={classes.topLayer}></canvas>
-    </React.Fragment>
+    </div>
   );
 };
 

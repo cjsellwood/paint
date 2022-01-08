@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../index";
 import {
@@ -8,19 +9,34 @@ import {
   redo,
   setThickness,
 } from "../store/actions/paint";
+import classes from "./Controls.module.css";
 
 const Controls = () => {
   const { tool, thickness } = useSelector((state: RootState) => state.paint);
   const dispatch = useDispatch();
 
+  // Add keyboard shortcuts for undo and redo
+  useEffect(() => {
+    document.addEventListener("keypress", (e) => {
+      if (e.ctrlKey && e.key === "z") {
+        dispatch(undo());
+      }
+      if (e.ctrlKey && e.key === "y") {
+        dispatch(redo());
+      }
+    });
+  }, [dispatch]);
+
   return (
-    <div>
-      <form>
+    <div className={classes.controls}>
+      <h1 className={classes.title}>Paint</h1>
+      <form className={classes.form}>
         <label>Color</label>
         <input
           type="color"
           onChange={(e) => dispatch(setColor(e.target.value))}
         />
+        <label>Tool</label>
         <select
           value={tool}
           onChange={(e) => dispatch(setTool(e.target.value))}
