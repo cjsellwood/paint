@@ -74,6 +74,7 @@ export const drawLine = (
   context.beginPath();
   context.strokeStyle = color;
   context.lineWidth = thickness;
+  context.lineCap = "round";
   context.moveTo(startX, startY);
   context.lineTo(endX, endY);
   context.stroke();
@@ -88,6 +89,8 @@ export const drawPencil = (
   context.beginPath();
   context.strokeStyle = color;
   context.lineWidth = thickness;
+  context.lineCap = "round";
+  context.lineJoin = "round";
   for (let point of coordinates) {
     context.lineTo(point.x, point.y);
     context.stroke();
@@ -179,8 +182,6 @@ export const fill = (
       }
     }
   };
-
-
 
   fillPixels(x, y);
 

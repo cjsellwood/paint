@@ -193,7 +193,7 @@ const Canvas = () => {
               topContext,
               colorRef.current,
               thicknessRef.current,
-              coordinates.slice(coordinates.length - 3, coordinates.length)
+              coordinates.slice(coordinates.length - 2, coordinates.length)
             );
             break;
           default:
