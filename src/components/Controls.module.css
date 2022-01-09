@@ -5,8 +5,9 @@
   user-select: none;
   width: 250px;
   height: 100vh;
-  color: turquoise;
+  color: rgb(255, 255, 255);
   font-size: 1.2rem;
+  padding: 8px;
 }
 
 .title {
@@ -15,4 +16,51 @@
   font-weight: bold;
   text-align: center;
   user-select: none;
+}
+
+.widthSelector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+}
+
+.widthSelector > input {
+  width: 100%;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.undoRedo {
+  display: flex;
+}
+
+.undoRedo div {
+  width: 16px;
+}
+
+.buttonContainer button {
+  background-color: rgb(80, 80, 80);
+  border: none;
+  outline: none;
+  font-size: 1.1rem;
+  color: white;
+  padding: 8px;
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
+  -o-border-radius: 0px;
+  cursor: pointer;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.controls button:hover {
+  background-color: rgb(100, 100, 100);
 }

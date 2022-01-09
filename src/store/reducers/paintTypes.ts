@@ -70,6 +70,9 @@ export type State = {
   save: boolean;
   undoIndex: number;
   thickness: number;
+  clearDrawing: boolean;
+  defaultColors: string[];
+  customColors: string[];
 };
 
 export type Action =
@@ -93,4 +96,6 @@ export type Action =
   | { type: "TOGGLE_SAVE" }
   | { type: "UNDO" }
   | { type: "REDO" }
-  | { type: "SET_THICKNESS"; thickness: number };
+  | { type: "SET_THICKNESS"; thickness: number }
+  | { type: "TOGGLE_CLEAR" }
+  | { type: "CLEAR_STEPS" };

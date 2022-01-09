@@ -52,3 +52,15 @@ export const setThickness = (thickness: number) => {
     thickness,
   };
 };
+
+export const toggleClear = () => {
+  return {
+    type: "TOGGLE_CLEAR",
+  };
+};
+
+export const clearSteps = () => {
+  return {
+    type: "CLEAR_STEPS",
+  };
+};

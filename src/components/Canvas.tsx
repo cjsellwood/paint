@@ -1,7 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import classes from "./Canvas.module.css";
-import { saveStep, blankStep, toggleSave } from "../store/actions/paint";
+import {
+  saveStep,
+  blankStep,
+  toggleSave,
+  toggleClear,
+  clearSteps,
+} from "../store/actions/paint";
 import { RootState } from "../index";
 import {
   drawRectangle,
@@ -22,9 +28,8 @@ const Canvas = () => {
   const topLayerRef = useRef(null);
 
   const dispatch = useDispatch();
-  const { steps, tool, color, save, undoIndex, thickness } = useSelector(
-    (state: RootState) => state.paint
-  );
+  const { steps, tool, color, save, undoIndex, thickness, clearDrawing } =
+    useSelector((state: RootState) => state.paint);
 
   // Use ref for colors to pass updated colours to event listeners
   const colorRef = useRef(color);
@@ -193,7 +198,7 @@ const Canvas = () => {
               topContext,
               colorRef.current,
               thicknessRef.current,
-              coordinates.slice(coordinates.length - 2, coordinates.length)
+              coordinates.slice(-2)
             );
             break;
           default:
@@ -399,6 +404,17 @@ const Canvas = () => {
     drawAllSteps(canvas, steps.slice(0, steps.length - undoIndex));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [undoIndex]);
+
+  // Completely reset drawing on clear button press
+  useEffect(() => {
+    if (clearDrawing) {
+      const canvas = ref.current! as HTMLCanvasElement;
+      clearCanvas(canvas);
+      drawBackground(canvas);
+      dispatch(clearSteps());
+      dispatch(toggleClear());
+    }
+  }, [dispatch, clearDrawing]);
 
   return (
     <div className={classes.canvasContainer}>

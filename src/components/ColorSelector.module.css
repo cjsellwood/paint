@@ -1,0 +1,45 @@
+.colorSelector {
+}
+
+.topColors {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topColors label {
+  margin-right: 4px;
+}
+
+.topColors input {
+  cursor: pointer;
+  border: none;
+  width: 60px;
+  height: 30px;
+}
+
+.topColors input::-webkit-color-swatch-wrapper {
+  border: none;
+  padding: 0;
+  border-radius: 10px;
+}
+
+.topColors input::-moz-color-swatch {
+  border: none;
+  padding: 0;
+}
+
+.savedColors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.color {
+  width: 22px;
+  height: 22px;
+  margin: 2px;
+  border: 1px solid rgb(153, 153, 153);
+  cursor: pointer;
+}

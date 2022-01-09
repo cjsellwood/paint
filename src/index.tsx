@@ -6,19 +6,12 @@ import { Provider } from "react-redux";
 import { createStore, combineReducers } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import paint from "./store/reducers/paint";
-import { Step } from "./store/reducers/paintTypes";
+import { State as PaintState } from "./store/reducers/paintTypes";
 
 const composeEnhancers = composeWithDevTools({});
 
 export interface RootState {
-  paint: {
-    steps: Step[];
-    color: string;
-    tool: string;
-    save: boolean;
-    undoIndex: number;
-    thickness: number;
-  };
+  paint: PaintState;
 }
 
 const rootReducer = combineReducers({
