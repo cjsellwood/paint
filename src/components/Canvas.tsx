@@ -60,11 +60,11 @@ const Canvas = () => {
     const canvas = ref.current! as HTMLCanvasElement;
 
     // Resize canvas to fit screen
-    canvas.width = window.innerWidth - 250;
+    canvas.width = window.innerWidth - 240;
     canvas.height = window.innerHeight - 20;
 
     const topCanvas = topLayerRef.current! as HTMLCanvasElement;
-    topCanvas.width = window.innerWidth - 250;
+    topCanvas.width = window.innerWidth - 240;
     topCanvas.height = window.innerHeight - 20;
   }, []);
 
